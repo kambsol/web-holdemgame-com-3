@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>德州扑克游戏 · 策略与趣味的在线牌局</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f4f8fb;
+            color: #1c2a36;
+            line-height: 1.6;
+            padding: 1.5rem 1rem 3rem;
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        /* —— 主视觉 —— */
+        .hero {
+            background: linear-gradient(145deg, #d9eee7 0%, #bfdfd4 100%);
+            border-radius: 2.5rem 2.5rem 2rem 2rem;
+            padding: 2.8rem 2rem 2.5rem;
+            margin-bottom: 2.4rem;
+            box-shadow: 0 8px 24px rgba(40, 94, 81, 0.08);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #13564b;
+            margin-bottom: 0.6rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.05rem;
+            color: #1f5c50;
+            max-width: 640px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* —— 网格卡片 —— */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.6rem;
+            margin: 2.4rem 0 2.6rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 1.8rem;
+            padding: 1.8rem 1.6rem;
+            box-shadow: 0 4px 12px rgba(0, 32, 24, 0.04);
+            border: 1px solid #d8eae3;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(30, 80, 70, 0.08);
+            border-color: #a8cfc1;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #146155;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.01em;
+        }
+
+        .card-title span {
+            font-size: 1.5rem;
+        }
+
+        .card p, .card li {
+            font-size: 0.97rem;
+            color: #2b4040;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 0.6rem;
+        }
+
+        .card li {
+            padding: 0.35rem 0 0.35rem 1.2rem;
+            position: relative;
+        }
+
+        .card li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #2a9d8f;
+            font-weight: 600;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e0f2ed;
+            color: #0e5549;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            margin-right: 0.3rem;
+        }
+
+        /* —— FAQ 摘要 —— */
+        .faq-section {
+            background: #ffffff;
+            border-radius: 2rem;
+            padding: 1.8rem 1.6rem;
+            margin: 2.2rem 0 2rem;
+            border: 1px solid #d3e6dd;
+        }
+
+        .faq-section h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #135e50;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .faq-item {
+            padding: 0.8rem 0;
+            border-bottom: 1px dashed #cde0d8;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-q {
+            font-weight: 600;
+            color: #1b4e45;
+            font-size: 0.98rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .faq-a {
+            font-size: 0.93rem;
+            color: #3b5a52;
+        }
+
+        /* —— 自然链接段落 —— */
+        .link-note {
+            background: #e3f2eb;
+            border-radius: 1.8rem;
+            padding: 1.6rem 1.8rem;
+            margin: 2rem 0 1.4rem;
+            border-left: 5px solid #2a9d8f;
+            font-size: 0.98rem;
+            color: #1e4d44;
+        }
+
+        .link-note a {
+            color: #0b6b5c;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 2px solid rgba(42, 157, 143, 0.3);
+            transition: border-color 0.2s;
+        }
+
+        .link-note a:hover {
+            border-bottom-color: #0b6b5c;
+        }
+
+        /* —— 辅助文字 & 页脚 —— */
+        .footnote {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #698b82;
+            margin-top: 2.8rem;
+            padding-top: 1rem;
+            border-top: 1px solid #cfe3da;
+            letter-spacing: 0.02em;
+        }
+
+        /* —— 响应式 —— */
+        @media (min-width: 600px) {
+            body {
+                padding: 2.5rem 1.8rem 4rem;
+            }
+
+            .hero {
+                padding: 3.4rem 3rem;
+                border-radius: 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.8rem;
+            }
+
+            .card {
+                padding: 2rem 1.8rem;
+            }
+
+            .faq-section {
+                padding: 2rem 2.2rem;
+            }
+
+            .link-note {
+                padding: 1.8rem 2.2rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .hero h1 {
+                font-size: 3.1rem;
+            }
+        }
+
+        /* 小细节 */
+        .emoji-icon {
+            filter: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- hero 主视觉 -->
+        <header class="hero">
+            <h1>♠️ 来一局德州扑克 · 在线牌桌</h1>
+            <p>快速判断一个网站是否合拍，就看它能不能让你舒舒服服地打一局。这里没有浮夸的奖励，只有清晰的规则、流畅的对局和真实的牌感。</p>
+        </header>
+
+        <!-- 信息卡片网格：用途 + 场景 + 适合人群 -->
+        <div class="grid">
+            <div class="card">
+                <div class="card-title"><span>🎯</span> 网站用途</div>
+                <p>一个专为德州扑克爱好者搭建的在线平台。主要用来：</p>
+                <ul>
+                    <li>模拟标准桌牌局，练习翻前翻后决策</li>
+                    <li>与来自不同地区的玩家进行即时对战</li>
+                    <li>熟悉不同位置、筹码深度下的常规打法</li>
+                </ul>
+                <p style="margin-top: 0.7rem;"><span class="tag">无注册门槛</span><span class="tag">免费对局</span></p>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span>🧩</span> 适合哪些人</div>
+                <ul>
+                    <li>刚接触德州扑克、想找个地方练手的新手</li>
+                    <li>有经验但不想打大底池、只想轻松娱乐的休闲玩家</li>
+                    <li>研究底池赔率、位置优势的进阶爱好者</li>
+                </ul>
+                <p style="margin-top: 0.6rem; font-size: 0.92rem;">不论什么水平，都能找到节奏合适的牌桌。</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span>♟️</span> 牌局特点</div>
+                <ul>
+                    <li>标准 52 张牌组，无额外花哨规则</li>
+                    <li>可快速加入或创建私人房间</li>
+                    <li>界面直接展示底池、行动按钮、对手状态</li>
+                </ul>
+                <p style="margin-top: 0.7rem;">筹码、盲注结构贴近线下现金局，减少学习成本。</p>
+            </div>
+        </div>
+
+        <!-- FAQ 摘要（常见疑问） -->
+        <section class="faq-section">
+            <h2><span>📌</span> 快速了解 · 常见疑问</h2>
+            <div class="faq-item">
+                <div class="faq-q">需要下载软件吗？</div>
+                <div class="faq-a">不需要。打开浏览器就能玩，移动端和桌面端均可直接访问。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">一局大概多久？</div>
+                <div class="faq-a">视玩家人数和盲注级别而定，通常 5–15 分钟一局，适合短时间放松。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">是否有真人玩家？</div>
+                <div class="faq-a">是的，平台匹配真实在线玩家；私人房间可邀请朋友加入。</div>
+            </div>
+        </section>
+
+        <!-- 自然链接段落 (嵌入 a 标签) -->
+        <div class="link-note">
+            <p>如果你在寻找一个清爽又不失策略深度的在线牌局，可以试试 <a href="https://web-holdemgame.com">德州扑克游戏</a>。它的节奏偏常规，没有花哨的皮肤或复杂的成就系统，更侧重于还原面对面打牌的感受。从看牌、加注到摊牌，每个环节都直白清晰。</p>
+        </div>
+
+        <!-- 补充介绍（内容差异化，不重复卡片） -->
+        <div style="display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 1.6rem 0 0.8rem;">
+            <div style="flex: 1; min-width: 200px; background: #ffffff; border-radius: 1.6rem; padding: 1.2rem 1.4rem; border: 1px solid #d8eae3;">
+                <h3 style="font-size: 1.05rem; color: #146155; margin-bottom: 0.5rem;">🃏 牌桌友好度</h3>
+                <p style="font-size: 0.92rem;">按钮位置高亮、行动顺序明确，新手不用费劲找自己的回合。每手牌结束后自动进入下一局，不拖沓。</p>
+            </div>
+            <div style="flex: 1; min-width: 200px; background: #ffffff; border-radius: 1.6rem; padding: 1.2rem 1.4rem; border: 1px solid #d8eae3;">
+                <h3 style="font-size: 1.05rem; color: #146155; margin-bottom: 0.5rem;">📱 移动端适配</h3>
+                <p style="font-size: 0.92rem;">在手机上操作顺畅，牌面、筹码、下注按钮都按比例缩放，不必频繁缩放屏幕。</p>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footnote">
+            <span>♠️♥️♣️♦️</span> 每次发牌都是一次新的思考 · 理性游戏，享受策略乐趣
+        </div>
+    </div>
+</body>
+</html>

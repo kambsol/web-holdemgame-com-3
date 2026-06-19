@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://kambsol.github.io/web-holdemgame-com-3/sitemap.xml
